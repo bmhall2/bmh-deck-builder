@@ -6,7 +6,13 @@ using Newtonsoft.Json;
 
 namespace DeckBuilder.Api
 {
-    public class EventStoreManager
+    public interface IEventStoreManager
+    {
+        List<ResolvedEvent> GetResolvedEvents(string streamId);
+        void AppendEventToStream(string streamId, string eventType, object @event);
+    }
+
+    public class EventStoreManager : IEventStoreManager
     {
         private readonly IEventStoreConnection _eventStoreConnection;
 

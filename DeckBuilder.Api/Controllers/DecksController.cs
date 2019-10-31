@@ -10,11 +10,11 @@ namespace DeckBuilder.Api.Controllers
     [ApiController]
     public class DecksController : ControllerBase
     {
-        private readonly EventStoreManager _eventStoreManager;
+        private readonly IEventStoreManager _eventStoreManager;
 
-        public DecksController()
+        public DecksController(IEventStoreManager eventStoreManager)
         {
-            _eventStoreManager = new EventStoreManager();
+            _eventStoreManager = eventStoreManager;
         }
 
         // POST api/deck

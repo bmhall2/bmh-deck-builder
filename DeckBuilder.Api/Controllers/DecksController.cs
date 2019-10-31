@@ -11,20 +11,23 @@ namespace DeckBuilder.Api.Controllers
     public class DecksController : ControllerBase
     {
         private readonly IEventStoreManager _eventStoreManager;
+        private readonly IDeckGenerator _deckGenerator;
+        private readonly IDeckEventsProcessor _deckEventsProcessor;
 
-        public DecksController(IEventStoreManager eventStoreManager)
+        public DecksController(IEventStoreManager eventStoreManager, IDeckGenerator deckGenerator, IDeckEventsProcessor deckEventsProcessor)
         {
             _eventStoreManager = eventStoreManager;
+            _deckGenerator = deckGenerator;
+            _deckEventsProcessor = deckEventsProcessor;
         }
 
         // POST api/deck
         [HttpPost]
         public string Create()
         {
-            var deckGenerator = new DeckGenerator();
             var deckCreatedEvent = new DeckCreatedEvent
             {
-                Deck = deckGenerator.Generate()
+                Deck = _deckGenerator.Generate()
             };
 
             var streamId = Guid.NewGuid().ToString();
@@ -43,7 +46,7 @@ namespace DeckBuilder.Api.Controllers
         public Deck Get(string streamId)
         {
             var streamEvents = _eventStoreManager.GetResolvedEvents(streamId);
-            return new DeckEventsProcessor().Execute(streamEvents);
+            return _deckEventsProcessor.Execute(streamEvents);
         }
     }
 }

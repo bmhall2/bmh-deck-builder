@@ -6,7 +6,12 @@ using Newtonsoft.Json;
 
 namespace DeckBuilder.Api.EventProcessors
 {
-    public class DeckEventsProcessor : IEventsProcessor<Deck>
+    public interface IDeckEventsProcessor
+    {
+        Deck Execute(List<ResolvedEvent> events);
+    }
+
+    public class DeckEventsProcessor : IDeckEventsProcessor
     {
         public Deck Execute(List<ResolvedEvent> events)
         {

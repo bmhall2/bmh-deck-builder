@@ -2,6 +2,7 @@
 using DeckBuilder.Api.EventProcessors;
 using DeckBuilder.Api.Events;
 using DeckBuilder.Api.Models;
+using DeckBuilder.Api.Projections;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeckBuilder.Api.Controllers
@@ -47,6 +48,12 @@ namespace DeckBuilder.Api.Controllers
         {
             var streamEvents = _eventStoreManager.GetResolvedEvents(streamId);
             return _deckEventsProcessor.Execute(streamEvents);
+        }
+
+        [HttpGet("/api/[controller]/stats")]
+        public CardDrawnCounter GetStats()
+        {
+            return _eventStoreManager.GetCardDrawnCounterProjection();
         }
     }
 }

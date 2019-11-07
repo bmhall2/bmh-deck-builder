@@ -17,11 +17,13 @@ namespace DeckBuilder.Api
         List<ResolvedEvent> GetResolvedEvents(string streamId);
         void AppendEventToStream(string streamId, string eventType, object @event);
         CardDrawnCounter GetCardDrawnCounterProjection();
+        CardDrawnCounter GetCardDrawnCounterByPartitionProjection(string streamId);
     }
 
     public class EventStoreManager : IEventStoreManager
     {
         private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly ProjectionsManager _projectionsManager;
         private readonly ILogger _logger;
 
         public EventStoreManager()
@@ -29,6 +31,7 @@ namespace DeckBuilder.Api
             _logger = new ConsoleLogger();
             _eventStoreConnection =
                 EventStoreConnection.Create(new Uri("tcp://admin:changeit@localhost:1113"), "DecksConnection");
+            _projectionsManager = new ProjectionsManager(_logger, new DnsEndPoint("127.0.0.1", 2113), new TimeSpan(0, 1, 0));
             _eventStoreConnection.ConnectAsync().Wait();
         }
 
@@ -61,9 +64,13 @@ namespace DeckBuilder.Api
 
         public CardDrawnCounter GetCardDrawnCounterProjection()
         {
-            var projectionsManager = new ProjectionsManager(_logger, new DnsEndPoint("127.0.0.1", 2113), new TimeSpan(0, 1, 0));
-            var result = projectionsManager.GetStateAsync("card-drawn-counter", new UserCredentials("admin", "changeit")).Result;
+            var result = _projectionsManager.GetStateAsync("card-drawn-counter", new UserCredentials("admin", "changeit")).Result;
+            return JsonConvert.DeserializeObject<CardDrawnCounter>(result);
+        }
 
+        public CardDrawnCounter GetCardDrawnCounterByPartitionProjection(string streamId)
+        {
+            var result = _projectionsManager.GetPartitionStateAsync("card-drawn-partition-counter", streamId, new UserCredentials("admin", "changeit")).Result;
             return JsonConvert.DeserializeObject<CardDrawnCounter>(result);
         }
     }

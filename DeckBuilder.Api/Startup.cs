@@ -1,4 +1,5 @@
 ﻿using DeckBuilder.Api.EventProcessors;
+using DeckBuilder.Api.ProjectionManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,9 @@ namespace DeckBuilder.Api
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            var projectionSynchronizer = new ProjectionSynchronizer();
+            projectionSynchronizer.SynchronizeProjections();
         }
     }
 }

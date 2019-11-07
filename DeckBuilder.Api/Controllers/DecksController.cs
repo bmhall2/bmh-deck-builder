@@ -55,5 +55,11 @@ namespace DeckBuilder.Api.Controllers
         {
             return _eventStoreManager.GetCardDrawnCounterProjection();
         }
+
+        [HttpGet("/api/[controller]/{streamId}/stats")]
+        public CardDrawnCounter GetDeckStats(string streamId)
+        {
+            return _eventStoreManager.GetCardDrawnCounterByPartitionProjection(streamId);
+        }
     }
 }
